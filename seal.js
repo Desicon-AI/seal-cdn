@@ -40,6 +40,9 @@
           console.log('[Seal] Rescue Engine Enabled. Fetching active patches...');
           this.fetchAndApplyPatches();
         }
+
+        // Fetch security policy and render trust badge if enabled
+        this.fetchPolicy();
       },
   
       /**
@@ -123,6 +126,134 @@
         })
         .catch(err => {
           // Silent catch
+        });
+      },
+
+      /**
+       * Fetch security policy and configuration
+       */
+      fetchPolicy: function() {
+        if (!config.apiKey) return;
+        fetch(`${config.apiEndpoint}/ingest/policy`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${config.apiKey}`
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.status === 'success' && data.policy && data.policy.trustBadge) {
+            if (data.policy.trustBadge.enabled) {
+              this.renderTrustBadge(data.policy.trustBadge);
+            }
+          }
+        })
+        .catch(err => {
+           // Silent catch
+        });
+      },
+
+      /**
+       * Render the Trust Badge on the screen based on config
+       */
+      renderTrustBadge: function(badgeConfig) {
+        // Prevent duplicate badges
+        if (document.getElementById('seal-trust-badge')) return;
+
+        const badge = document.createElement('a');
+        badge.id = 'seal-trust-badge';
+        badge.href = 'https://sealplatform.desicon.ai/trust';
+        badge.target = '_blank';
+        badge.rel = 'noopener noreferrer';
+        
+        // Base styling
+        badge.style.display = 'flex';
+        badge.style.alignItems = 'center';
+        badge.style.gap = '8px';
+        badge.style.padding = '8px 12px';
+        badge.style.borderRadius = '8px';
+        badge.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+        badge.style.fontSize = '12px';
+        badge.style.fontWeight = '600';
+        badge.style.textDecoration = 'none';
+        badge.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+        badge.style.transition = 'all 0.2s ease';
+        badge.style.zIndex = '999999';
+        
+        // Theme
+        if (badgeConfig.theme === 'light') {
+          badge.style.backgroundColor = '#ffffff';
+          badge.style.color = '#1f2937';
+          badge.style.border = '1px solid #e5e7eb';
+        } else if (badgeConfig.theme === 'minimal') {
+          badge.style.backgroundColor = 'transparent';
+          badge.style.color = '#6b7280';
+          badge.style.boxShadow = 'none';
+        } else { // dark
+          badge.style.backgroundColor = '#111827';
+          badge.style.color = '#f9fafb';
+          badge.style.border = '1px solid #374151';
+        }
+
+        // Positioning
+        if (badgeConfig.position === 'inline') {
+          badge.style.display = 'inline-flex';
+          const container = document.getElementById('seal-badge-container');
+          if (container) {
+            container.appendChild(badge);
+          } else {
+             badge.style.position = 'fixed';
+             badge.style.bottom = '20px';
+             badge.style.right = '20px';
+             document.body.appendChild(badge);
+          }
+        } else if (badgeConfig.position === 'footer') {
+           const footer = document.querySelector('footer');
+           if (footer) {
+               badge.style.display = 'inline-flex';
+               badge.style.margin = '20px auto';
+               footer.appendChild(badge);
+           } else {
+               badge.style.position = 'fixed';
+               badge.style.bottom = '20px';
+               badge.style.right = '20px';
+               document.body.appendChild(badge);
+           }
+        } else {
+          badge.style.position = 'fixed';
+          if (badgeConfig.position === 'bottom_left') {
+            badge.style.bottom = '20px';
+            badge.style.left = '20px';
+          } else if (badgeConfig.position === 'top_right_corner') {
+            badge.style.top = '20px';
+            badge.style.right = '20px';
+          } else { // default bottom_right
+            badge.style.bottom = '20px';
+            badge.style.right = '20px';
+          }
+          document.body.appendChild(badge);
+        }
+        
+        // SVG Icon
+        badge.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #10b981;">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          Protected by Seal
+        `;
+
+        // Hover effect
+        badge.addEventListener('mouseenter', () => {
+           badge.style.transform = 'translateY(-2px)';
+           if (badgeConfig.theme !== 'minimal') {
+               badge.style.boxShadow = '0 6px 16px rgba(0,0,0,0.15)';
+           }
+        });
+        badge.addEventListener('mouseleave', () => {
+           badge.style.transform = 'translateY(0)';
+           if (badgeConfig.theme !== 'minimal') {
+               badge.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+           }
         });
       }
     };
