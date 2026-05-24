@@ -1,14 +1,14 @@
 {
-  "name": "desicon-grumpy-cdn",
+  "name": "@desicon/seal-cdn",
   "version": "1.0.0",
-  "description": "Browser CDN script for Grumpy AI Rescue Engine",
-  "main": "grumpy.js",
+  "description": "Browser CDN script for Seal AI Rescue Engine",
+  "main": "seal.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/desicon/grumpy-cdn"
+    "url": "https://github.com/Desicon-AI/seal-cdn"
   },
   "keywords": [
     "sre",
@@ -18,6 +18,10 @@
     "browser",
     "cdn"
   ],
-  "author": "Desicon Platform",
+  "author": {
+    "name": "Desicon",
+    "email": "support+seal@desicon.ai",
+    "url": "https://seal.desicon.ai/"
+  },
   "license": "MIT"
 }
