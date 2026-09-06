@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "Browser CDN script for Seal AI Rescue Engine",
   "main": "seal.js",
+  "files": ["seal.js", "README.md"],
   "scripts": {
     "test": "node --test test/*.test.cjs"
   },
