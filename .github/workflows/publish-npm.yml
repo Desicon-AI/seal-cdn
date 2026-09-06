@@ -50,4 +50,4 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --global npm@11
-      - run: npm publish dist/*.tgz --access public --ignore-scripts
+      - run: npm publish ./dist/*.tgz --access public --ignore-scripts
